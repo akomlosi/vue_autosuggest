@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import AutoSuggest from './components/AutoSuggest'
+import AutoSuggest from './components/AutoSuggest';
 
 export default {
   name: 'app',

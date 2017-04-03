@@ -1,12 +1,9 @@
 <template>
-	<div id="autosuggest">
+	<div id="autosuggest" class="auto_suggest_list">
 		<input type="text" v-model="searchText" v-on:keyup="onKeyup"/>
 		<div v-if="hasResults">
 			<ul>
-				<li v-for="model in response">
-					<img v-bind:src=" model.pic "/>
-					{{ model.name }}
-				</li>
+				<result v-for="(result, index) in results" :key="index" :result="result"></result>
 			</ul>
 		</div>
 	</div>
@@ -55,10 +52,21 @@
 <script>
 
 	import Vue from 'vue';
+	import Result from './Result.vue';
 
 	var autosuggest = {
-		name  : 'autosuggest',
-		props : ['category', 'url'],
+		name       : 'autosuggest',
+		components : {Result},
+		props      : {
+			category : {
+				type    : String,
+				default : 'girl'
+			},
+			url      : {
+				type    : String,
+				default : '/auto-suggest-search/auto-suggest'
+			}
+		},
 		data(){
 			return {
 				searchText : null,
@@ -80,15 +88,26 @@
 					window.fetch(req).then((response) => {
 						response.json().then((res) => {
 							this.hasResults = true;
-							this.response = res.data.rawdata;
-					})
+							this.$store.commit('search', {
+								searchText : this.searchText,
+								response   : res.data.rawdata,
+								hasResults : this.hasResults
+							});
+						})
 					}).catch(function(e) {
 						console.error("e: ", e);
 					});
+
 				}
 				else {
 					this.hasResults = false;
 				}
+			}
+		},
+
+		computed : {
+			results() {
+				return this.$store.state.result.response;
 			}
 		}
 	};
